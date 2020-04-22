@@ -19,7 +19,9 @@ class MyApp : public cinder::app::App {
   void keyDown(cinder::app::KeyEvent) override;
   void DrawFirstPaddle();
   void DrawSecondPaddle();
+  void DrawBall();
 
+  void MakeBallPhysics();
 };
 
 }  // namespace myapp
