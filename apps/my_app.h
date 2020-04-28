@@ -22,6 +22,14 @@ class MyApp : public cinder::app::App {
   void DrawBall();
 
   void MakeBallPhysics();
+  void TestDraw();
+  void DrawWalls();
+  void PrintScore();
+  void PrintText(const std::string& text, const cinder::ivec2& size,
+                 const cinder::vec2& loc);
+  bool IsBallTouchingPaddle1();
+  bool IsBallTouchingPaddle2();
+
 };
 
 }  // namespace myapp
