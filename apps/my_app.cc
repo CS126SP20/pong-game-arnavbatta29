@@ -18,8 +18,8 @@ int p1PaddlePosition = 20;
 int p2PaddlePosition = 20;
 double circleXPos = 300;
 double circleYPos = 200;
-double slopeYOfBallMovement = 3;
-double slopeXOfBallMovement = 3;
+double slopeYOfBallMovement = 30;
+double slopeXOfBallMovement = 30;
 int maxDimension = 800;
 double wallBounceConstant = 1.01;
 b2Vec2 gravity(0.0, 0.0);
@@ -48,28 +48,30 @@ void MyApp::setup() {
     bodyDef.type = b2_dynamicBody;
     bodyDef.position.Set(circleXPos, circleYPos);
     body = world.CreateBody(&bodyDef);
-    velocity = {3.0, 5.0};
+    velocity = {30.0, 50.0};
     body->SetLinearVelocity(velocity);
     // body->ApplyLinearImpulse(b2Vec2(0,10), body->GetPosition());
     b2CircleShape* circle = new b2CircleShape();
-    circle->m_radius = 8;
+    circle->m_radius = 0.8;
 
     b2FixtureDef* fixtureDef = new b2FixtureDef();
     fixtureDef->shape = circle;
-    fixtureDef->density = 0.1;
-    fixtureDef->friction = 0;
+    fixtureDef->density = 10;
+    fixtureDef->friction = 0.1;
     fixtureDef->restitution = 0.6f; // Make it bounce a little bit
 
     body->CreateFixture(fixtureDef);
+
 }
 
 void MyApp::update() {
-    world.Step(10, 10, 1);
+    world.Step(150, 1, 1);
     DrawFirstPaddle();
     DrawSecondPaddle();
     DrawBall();
     // TestDraw();
     MakeBallPhysics();
+    std::cout << circleXPos << ", " << circleYPos << ";" << body->GetPosition().x << ", " << body->GetPosition().x << "\n";
 }
 
 void MyApp::draw() {
@@ -80,7 +82,7 @@ void MyApp::draw() {
     MakeBallPhysics();
     DrawBall();
     PrintScore();
-
+    DrawWalls();
 }
 
 void MyApp::MakeBallPhysics() {
@@ -97,10 +99,15 @@ void MyApp::TestDraw() {
 void MyApp::PrintScore() {
     cinder::gl::color(1,1,1);
     const std::string text = std::to_string(topScore);
-    const cinder::ivec2 size = {10, 10};
-    const cinder::vec2 loc = {50, 50};
+    const cinder::ivec2 size = {50, 50};
+    const cinder::vec2 loc = {50, 350};
+
+    const std::string text2 = std::to_string(bottomScore);
+    const cinder::ivec2 size2 = {50, 50};
+    const cinder::vec2 loc2 = {50, 450};
 
     PrintText(text, size, loc);
+    PrintText(text2, size2, loc2);
 }
 
 void MyApp::PrintText(const std::string& text, const cinder::ivec2& size,
@@ -113,7 +120,7 @@ void MyApp::PrintText(const std::string& text, const cinder::ivec2& size,
             .text(text);
 
     const auto box_size = box.getSize();
-    const cinder::vec2 locp = {loc.x - box_size.x / 2, loc.y - box_size.y / 2};
+    const cinder::vec2 locp = {loc.x - box_size.x / 1, loc.y - box_size.y / 1};
     const auto surface = box.render();
     const auto texture = cinder::gl::Texture::create(surface);
     cinder::gl::draw(texture, locp);
@@ -133,7 +140,11 @@ void MyApp::DrawFirstPaddle() {
 }
 
 void MyApp::DrawWalls() {
-
+    cinder::gl::color(1, 1, 1);
+    cinder::gl::drawSolidRect(Rectf(0,0,800, 10));
+    cinder::gl::drawSolidRect(Rectf(0,0,10, 800));
+    cinder::gl::drawSolidRect(Rectf(790,0,800, 800));
+    cinder::gl::drawSolidRect(Rectf(0,790,800, 800));
 }
 
 void MyApp::DrawSecondPaddle() {
@@ -157,7 +168,8 @@ void MyApp::DrawBall() {
         circleYPos = circleYPos - slopeYOfBallMovement;
         slopeXOfBallMovement *= -wallBounceConstant;
         slopeYOfBallMovement *= -wallBounceConstant;
-        velocity = {-1*velocity.x, -1*velocity.y};
+        velocity = {-1*velocity.x, -1*velocity.y*((float) 0.5 + (float) rand() / (RAND_MAX))};
+        topScore++;
     } else if (circleXPos < 0 && circleYPos < 0) {
         cinder::gl::drawSolidCircle({circleXPos + slopeXOfBallMovement,
                                      circleYPos + slopeYOfBallMovement}, 8);
@@ -166,7 +178,8 @@ void MyApp::DrawBall() {
         circleYPos = circleYPos + slopeYOfBallMovement;
         slopeXOfBallMovement *= -wallBounceConstant;
         slopeYOfBallMovement *= -wallBounceConstant;
-        velocity = {-1*velocity.x, -1*velocity.y};
+        velocity = {-1*velocity.x, -1*velocity.y*((float) 0.5 + (float) rand() / (RAND_MAX))};
+        bottomScore++;
     } else if (circleXPos >= maxDimension || circleXPos <= 0) {
         cinder::gl::drawSolidCircle({circleXPos - slopeXOfBallMovement,
                                      circleYPos + slopeYOfBallMovement}, 8);
@@ -175,27 +188,38 @@ void MyApp::DrawBall() {
         slopeXOfBallMovement *= -wallBounceConstant;
         velocity = {-1*velocity.x, velocity.y};
     } else if (circleYPos >= maxDimension || circleYPos <= 0) {
-        cinder::gl::drawSolidCircle({circleXPos + slopeXOfBallMovement,
-                                     circleYPos - slopeYOfBallMovement}, 8);
-
-        circleXPos = circleXPos + slopeXOfBallMovement;
-        circleYPos = circleYPos - slopeYOfBallMovement;
-        slopeYOfBallMovement *= -wallBounceConstant;
-        velocity = {velocity.x, -1*velocity.y};
+        if (circleYPos >= maxDimension) {
+            topScore++;
+            circleXPos = 400;
+            circleYPos = 400;
+            cinder::gl::drawSolidCircle({400, 400}, 8);
+            body->SetTransform(b2Vec2(400,400),body->GetAngle());
+            velocity = {velocity.x, velocity.y};
+            return;
+        } else {
+            bottomScore++;
+            circleXPos = 400;
+            circleYPos = 400;
+            cinder::gl::drawSolidCircle({400, 400}, 8);
+            body->SetTransform(b2Vec2(400,400),body->GetAngle());
+            velocity = {velocity.x * ((float) 0.5 + (float) rand() / (RAND_MAX)), velocity.y
+                        * ((float) 0.5 * (float) rand() / (RAND_MAX))};
+            return;
+        }
     } else if (IsBallTouchingPaddle1()) {
         cinder::gl::drawSolidCircle({circleXPos + slopeXOfBallMovement,
                                      circleYPos - slopeYOfBallMovement}, 8);
         circleXPos = circleXPos + slopeXOfBallMovement;
         circleYPos = circleYPos - slopeYOfBallMovement;
         slopeYOfBallMovement *= -wallBounceConstant;
-        velocity = {velocity.x, -1*velocity.y};
+        velocity = {velocity.x, -1*velocity.y * ((float) 0.5 + (float) rand() / (RAND_MAX))};
     } else if (IsBallTouchingPaddle2()) {
         cinder::gl::drawSolidCircle({circleXPos + slopeXOfBallMovement,
                                      circleYPos - slopeYOfBallMovement}, 8);
         circleXPos = circleXPos + slopeXOfBallMovement;
         circleYPos = circleYPos - slopeYOfBallMovement;
         slopeYOfBallMovement *= -wallBounceConstant;
-        velocity = {velocity.x, -1*velocity.y};
+        velocity = {velocity.x, -1*velocity.y * ((float) 0.5 + (float) rand() / (RAND_MAX))};
     }
     else {
         cinder::gl::drawSolidCircle({circleXPos + slopeXOfBallMovement,
