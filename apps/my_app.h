@@ -21,7 +21,7 @@ class MyApp : public cinder::app::App {
   void DrawSecondPaddle();
   void DrawBall();
 
-  void MakeBallPhysics();
+  void MakeWallPhysics();
   void TestDraw();
   void DrawWalls();
   void PrintScore();
