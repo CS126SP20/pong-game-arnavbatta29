@@ -11,3 +11,9 @@
 
 4/28/20 - Added a scorekeeping system for when ball touched the opposite 
 side and reset the ball's position
+
+5/3/20 - Reduced the size of the gameplay area, fixed ball speed
+
+5/4/20 - Randomized "bounce" off walls and paddle, added a practice mode feature 
+
+5/5/20 - Fixed range of motion of paddles so they wouldn't leave game area
