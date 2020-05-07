@@ -6,8 +6,6 @@
 #include <cinder/app/App.h>
 #include <Box2D/Box2D.h>
 
-
-
 namespace myapp {
 
 class MyApp : public cinder::app::App {
@@ -21,8 +19,8 @@ class MyApp : public cinder::app::App {
   void DrawSecondPaddle();
   void DrawBall();
 
-  void MakeWallPhysics();
-  void TestDraw();
+  void PrintPosition();
+  void EndGame();
   void DrawWalls();
   void PrintScore();
   void PrintText(const std::string& text, const cinder::ivec2& size,

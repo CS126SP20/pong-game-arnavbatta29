@@ -17,3 +17,5 @@ side and reset the ball's position
 5/4/20 - Randomized "bounce" off walls and paddle, added a practice mode feature 
 
 5/5/20 - Fixed range of motion of paddles so they wouldn't leave game area
+
+5/6/20 - Added options to quit game, reset scores, and view ball position
