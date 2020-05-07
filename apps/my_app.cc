@@ -197,7 +197,6 @@ void MyApp::DrawWalls() {
     cinder::gl::drawSolidRect(Rectf(150,795,650, 800));
     cinder::gl::drawSolidRect(Rectf(635,0,650, 800));
     cinder::gl::drawSolidRect(Rectf(140,0,155, 800));
-
 }
 
 /**
